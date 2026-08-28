@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>review-an-app</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem;background:#0f172a;color:#e2e8f0;
+ font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:52rem;margin:0 auto;background:#1e293b;border:1px solid #334155;
+ border-radius:12px;padding:2rem 2.25rem}
+h1,h2,h3,h4{color:#fb923c;line-height:1.25;margin:2rem 0 .75rem}
+h1{margin-top:0;font-size:1.9rem}h2{font-size:1.4rem;border-bottom:1px solid #334155;padding-bottom:.35rem}
+h3{font-size:1.15rem;color:#2dd4bf}
+a{color:#2dd4bf}a:hover{color:#fb923c}
+p,li{color:#cbd5e1}
+code{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #334155;padding:.5rem .75rem;text-align:left}
+th{background:#0f172a;color:#e2e8f0}
+td{color:#cbd5e1}
+blockquote{margin:1rem 0;padding:.75rem 1rem;border-left:3px solid #fb923c;background:#0f172a;border-radius:0 8px 8px 0}
+blockquote p{margin:.25rem 0}
+hr{border:0;border-top:1px solid #334155;margin:2rem 0}
+</style></head>
+<body><main>
+<h1 id="review-an-app">review-an-app</h1>
+<p>Reads a web app that already exists and reports what is actually wrong with it. Read-only by default. <a href="../../skills/skills/review-an-app/SKILL.md"><code>SKILL.md</code></a>, four reference files.</p>
+<h2 id="why-it-exists-as-its-own-skill">Why it exists as its own skill</h2>
+<p>Three other things already review code, and all three are anchored to something other than the app:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Anchored to</th>
+<th>Blind to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/code-review</code></td>
+<td>The pending diff</td>
+<td>Anything already wrong before this branch</td>
+</tr>
+<tr>
+<td><code>deploy-an-app</code></td>
+<td>Whether a deploy will land</td>
+<td>Whether the app is right</td>
+</tr>
+<tr>
+<td><code>start-an-app</code> critics</td>
+<td>A build sheet written the day the app was scaffolded</td>
+<td>Six months of change since</td>
+</tr>
+</tbody>
+</table>
+<p>An app six months in has drifted past all three. This skill reviews the thing itself, as it is now.</p>
+<h2 id="the-two-rules-that-define-it">The two rules that define it</h2>
+<p><strong>The app is its own spec.</strong> There is no build sheet here. The only things to measure against are the app's own claims — what the landing page sells, what the docs instruct, what the privacy policy promises, what the sitemap invites a crawler to open, what a button implies when it renders. A <a href="../overview/key-concepts.html">finding</a> is a <strong>contradiction</strong> between what the app says and what it does.</p>
+<p><strong>Absence is not a finding.</strong> "No rate limiting", "no tests", "consider adding structured data" — none of these are things the app got wrong. They are things a bigger app would have. The skill states the stakes plainly: the fastest way to make it worthless is to let it list what a mature product does, because that report gets skimmed once and never again.</p>
+<p>Two corollaries. <strong>Consequence, not pattern</strong>: "this query isn't scoped by user" is a pattern; "any signed-in account can read every other account's invoices by changing the id in the URL — <code>src/app/invoices/[id]/page.tsx:14</code>" is a finding. And <strong>the user's choices are not findings</strong>: a stack you would have picked differently, or a deliberate decision to stay out of search, is not wrong. Where a choice looks like an accident, report the evidence that it was an accident, not the choice.</p>
+<h2 id="how-it-works">How it works</h2>
+<pre><code>Step 1  Orient          read the stack, the branches, the claims
+   │
+Step 2  Evidence        capture once — routes, probes, served HTML     ← no secrets
+   │
+Step 3  Lenses          ┌─ security ─┐
+        (parallel)      ├─ discover. ─┤  each gets one brief, sees no other output
+                        └─ drift ────┘
+   │
+Step 4  Reconcile       re-check every suspect with a command; dedupe; rank
+   │
+Step 5  Report          worst-first, plain language, what was NOT checked
+   │
+Step 6  Fix             only if you ask
+</code></pre>
+<h3 id="step-1-orient">Step 1 — Orient</h3>
+<p>Establish four things from the code, not by asking: <strong>the stack</strong> (framework, router, ORM, auth library), <strong>which branches exist</strong>, <strong>whether the app is meant to be found</strong> (<code>robots.ts</code>, <code>robots.txt</code>, root layout metadata), and <strong>what the app claims</strong> (landing page, docs, legal pages, pricing).</p>
+<p>The skill is written for what <code>start-an-app</code> builds. Where it meets a different stack it says so in the report and says which checks that weakened — a review that pretends to full coverage over a stack it does not know is worse than a narrower one that names its edges.</p>
+<p>Knowing the branches turns lenses <em>off</em> as much as on. A lens that knows the app has no payments will not go looking for webhook verification.</p>
+<h3 id="step-2-evidence-once">Step 2 — Evidence, once</h3>
+<p>Three lenses run at the same time and cannot share a port, a database, or a browser. Whatever is not captured here is something three agents each try to find out for themselves, badly. <code>references/evidence.md</code> has the commands: the route inventory, whether the app runs, the probe sweep.</p>
+<blockquote>
+<p><strong>Warning:</strong> No secret enters the evidence pack. Variable <em>names</em> from <code>.env</code>, never values. <code>git diff</code> and served HTML get read for leaks, never pasted wholesale. A review that leaks the key it was checking on is the only way this skill can do real damage.</p>
+</blockquote>
+<h3 id="step-3-the-three-lenses">Step 3 — The three lenses</h3>
+<p>Dispatched in a single message so they run at once.</p>
+<table>
+<thead>
+<tr>
+<th>Lens</th>
+<th>Brief</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Security</td>
+<td><code>references/security.md</code></td>
+<td>OWASP Top 10, grounded in what this stack actually gets wrong</td>
+</tr>
+<tr>
+<td>Discoverability</td>
+<td><code>references/seo.md</code></td>
+<td>sitemap, <code>robots.txt</code>, <code>llms.txt</code>, metadata — still true, or not</td>
+</tr>
+<tr>
+<td>Drift</td>
+<td><code>references/drift.md</code></td>
+<td>what the app claims, against what it does</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Each lens gets its own reference file and nothing else</strong> — not <code>SKILL.md</code>, and not another lens's output. A lens that can see another's findings starts agreeing with them, and three agreeing agents read as corroboration when they are only an echo.</p>
+<p>Note the deliberate contrast with <code>start-an-app</code>. There, critics are kept <em>away</em> from the files the app was built from. Here, the reference files are handed <em>to</em> the reviewers. The difference is what the file is: build instructions given to a critic turn it back into a checklist-runner; these were written for the reviewer.</p>
+<p>Lenses get evidence, not access. A lens that can run things will spend its budget running things.</p>
+<h3 id="step-4-reconcile">Step 4 — Reconcile</h3>
+<p>The lenses are done and none of them is right yet.</p>
+<ul>
+<li><strong>Re-check every <code>suspect</code> with a command.</strong> This is what separates a review from a guess. If the command disagrees, drop the finding and say in one line that it was checked and cleared.</li>
+<li><strong>Deduplicate across lenses.</strong> A privacy policy promising deletion that nothing performs is one finding, not two. Keep the version that names the consequence best.</li>
+<li><strong>Drop anything without a <code>path:line</code>, a response, or a quote.</strong> If it has none, it was an opinion wearing a template.</li>
+<li><strong>Where two lenses disagree, the one holding a <code>path:line</code> wins.</strong> Where both do, it is genuine ambiguity and goes in as one finding.</li>
+<li><strong>Rank by consequence, not by lens.</strong> One ordered list. An unverified payment webhook and a stale <code>llms.txt</code> do not belong in the same section just because they came from different agents.</li>
+</ul>
+<h3 id="step-5-report">Step 5 — Report</h3>
+<p>Worst-first, in plain language, for someone who may not read code. Lead with the count and the shape — "four things are wrong, one seriously" — then each finding: what it is, where, why it matters to a person, and what fixing it involves.</p>
+<p>Then the part that makes it honest:</p>
+<ul>
+<li><strong>What was checked, and how.</strong> Whether the app was served or only read. The two produce very different confidence, and the reader cannot tell them apart from the findings alone.</li>
+<li><strong>What was not checked, and what it would need.</strong> A browser, a key, a live payment, a production domain.</li>
+<li><strong>The closing sentence never says the app is secure.</strong> No review establishes that. "No vulnerabilities found" is a sentence this skill must never produce, because it will be quoted back later by someone who has stopped looking.</li>
+</ul>
+<p>If a lens found nothing, that is one line, and it is a result rather than a failure.</p>
+<h3 id="step-6-fix-only-if-asked">Step 6 — Fix, only if asked</h3>
+<p>The review ends at Step 5. If you then ask for fixes: confirmed <code>broken</code> findings first, one at a time, each verified after. <strong>Fixes touch only the files the finding names</strong> — no refactors, no tidying, no "while I'm in here". This is somebody's working app, not a scaffold. A fix needing a schema change goes through <code>db:generate</code>, a read of the generated SQL, then <code>db:migrate</code> — never <code>push</code>, never an edit to a migration already applied. Nothing on the <code>worth knowing</code> list gets fixed unless you name it.</p>
+<h2 id="interaction-with-other-skills">Interaction with other skills</h2>
+<ul>
+<li>Runs on any app, including one this collection did not build — it detects branches by reading code.</li>
+<li>Complements <code>start-an-app</code> Step 7 rather than repeating it. Those critics measure against the build sheet; this measures against the app.</li>
+<li>Run it before <code>deploy-an-app</code> if the app has been alive a while.</li>
+</ul>
+<h2 id="gotchas">Gotchas</h2>
+<p><strong>Read-only means read-only.</strong> The skill may serve the app to probe it and changes nothing else. Fixing is a separate, explicit ask.</p>
+<p><strong>Version numbers are established at review time, never written down.</strong> AI crawler user-agent tokens, advisory databases, and framework file conventions all move.</p>
+<p><strong>A long report deserves a page.</strong> The skill offers to publish it rather than leaving it in terminal scrollback.</p>
+<h2 id="reference-files">Reference files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>evidence.md</code></td>
+<td>The capture commands, and the no-secrets rule</td>
+</tr>
+<tr>
+<td><code>security.md</code></td>
+<td>The security lens brief — OWASP Top 10 for this stack</td>
+</tr>
+<tr>
+<td><code>seo.md</code></td>
+<td>The discoverability lens brief</td>
+</tr>
+<tr>
+<td><code>drift.md</code></td>
+<td>The drift lens brief</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../architecture/shared-design-rules.html">shared design rules</a> for the invariants this skill shares with the other three, and <a href="../guides/customizing-references.html">customizing a skill</a> to change a brief.</p>
+</main></body></html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Customize a skill</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem;background:#0f172a;color:#e2e8f0;
+ font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:52rem;margin:0 auto;background:#1e293b;border:1px solid #334155;
+ border-radius:12px;padding:2rem 2.25rem}
+h1,h2,h3,h4{color:#fb923c;line-height:1.25;margin:2rem 0 .75rem}
+h1{margin-top:0;font-size:1.9rem}h2{font-size:1.4rem;border-bottom:1px solid #334155;padding-bottom:.35rem}
+h3{font-size:1.15rem;color:#2dd4bf}
+a{color:#2dd4bf}a:hover{color:#fb923c}
+p,li{color:#cbd5e1}
+code{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #334155;padding:.5rem .75rem;text-align:left}
+th{background:#0f172a;color:#e2e8f0}
+td{color:#cbd5e1}
+blockquote{margin:1rem 0;padding:.75rem 1rem;border-left:3px solid #fb923c;background:#0f172a;border-radius:0 8px 8px 0}
+blockquote p{margin:.25rem 0}
+hr{border:0;border-top:1px solid #334155;margin:2rem 0}
+</style></head>
+<body><main>
+<h1 id="customize-a-skill">Customize a skill</h1>
+<p>Change what a skill builds — a different auth provider, a different host, a different design rule — by editing one reference file.</p>
+<h2 id="when-you-need-this">When you need this</h2>
+<p>The <code>SKILL.md</code> files hold the procedure and the ground rules. The <code>references/</code> files hold every command, package name, and piece of config. That split is deliberate: <strong>the skill file never names a package or a version</strong>, so swapping a component means editing one reference file, not unpicking a procedure.</p>
+<p>Swap a provider when you already use a different one, when a provider is unavailable in your country, or when a reference file has gone stale and the skill told you at hand-off which file to fix.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>The skills installed, or the repository cloned. <code>npx skills add leonvanzyl/skills</code> installs all four.</li>
+<li>A text editor. Every file is Markdown.</li>
+<li>No build step. Skills are read at run time.</li>
+</ul>
+<h2 id="steps">Steps</h2>
+<p><strong>1. Find the file that owns the component.</strong></p>
+<p>Each reference file covers exactly one thing, and its <code>Purpose:</code> line at the top says which.</p>
+<table>
+<thead>
+<tr>
+<th>You want to change</th>
+<th>Edit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The auth provider</td>
+<td><code>start-an-app/references/auth.md</code></td>
+</tr>
+<tr>
+<td>The database or ORM</td>
+<td><code>start-an-app/references/database.md</code></td>
+</tr>
+<tr>
+<td>The email provider</td>
+<td><code>start-an-app/references/email.md</code></td>
+</tr>
+<tr>
+<td>The payments provider</td>
+<td><code>start-an-app/references/payments.md</code></td>
+</tr>
+<tr>
+<td>File storage</td>
+<td><code>start-an-app/references/storage.md</code></td>
+</tr>
+<tr>
+<td>The AI provider</td>
+<td><code>start-an-app/references/ai.md</code></td>
+</tr>
+<tr>
+<td>The background-job runner</td>
+<td><code>start-an-app/references/jobs.md</code></td>
+</tr>
+<tr>
+<td>Design tokens and <code>DESIGN.md</code></td>
+<td><code>start-an-app/references/design.md</code></td>
+</tr>
+<tr>
+<td>The gate commands</td>
+<td><code>start-an-app/references/verify.md</code></td>
+</tr>
+<tr>
+<td>The hosting platform</td>
+<td><code>deploy-an-app/references/deploy.md</code>, plus <code>project-and-url.md</code> and <code>env.md</code></td>
+</tr>
+<tr>
+<td>Production database provisioning</td>
+<td><code>deploy-an-app/references/provision-database.md</code></td>
+</tr>
+<tr>
+<td>What a security review looks for</td>
+<td><code>review-an-app/references/security.md</code></td>
+</tr>
+<tr>
+<td>What counts as drift</td>
+<td><code>review-an-app/references/drift.md</code></td>
+</tr>
+<tr>
+<td>Logo construction rules</td>
+<td><code>create-brand-kit/references/design.md</code></td>
+</tr>
+<tr>
+<td>What ships in the kit</td>
+<td><code>create-brand-kit/references/deliverables.md</code></td>
+</tr>
+</tbody>
+</table>
+<p>Full lists live on each concept page: <a href="../concepts/start-an-app.html">start-an-app</a>, <a href="../concepts/review-an-app.html">review-an-app</a>, <a href="../concepts/deploy-an-app.html">deploy-an-app</a>, <a href="../concepts/create-brand-kit.html">create-brand-kit</a>.</p>
+<p><strong>2. Check what else references it.</strong></p>
+<p>Search the whole skill folder before editing. A provider named in one reference file is usually named in two or three more.</p>
+<pre><code class="language-bash">grep -rn &quot;Resend&quot; skills/skills/
+</code></pre>
+<p>Sign-in is the widest blast radius. Anything that changes <code>src/lib/auth.ts</code> is also touched by payments, agent access, and settings — because <strong>Better Auth owns anything that belongs to a user</strong>, and integrations go through its plugins rather than beside them.</p>
+<p><strong>3. Edit the file.</strong></p>
+<p>Keep the file's existing shape. Every reference file has the same three parts, and the skill depends on all of them:</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Last verified:</code> date</td>
+<td>Step 2 of <code>start-an-app</code> uses it to size the research effort</td>
+</tr>
+<tr>
+<td><code>**Purpose:**</code> line</td>
+<td>How the agent decides whether to load the file</td>
+</tr>
+<tr>
+<td><code>Verify</code> section</td>
+<td>The agent completes it before moving to the next scaffold step</td>
+</tr>
+</tbody>
+</table>
+<p>Update the date when you edit. Rewrite the <code>Verify</code> section to match what you changed — a verify block checking the old provider is worse than none.</p>
+<p><strong>4. Write no version numbers.</strong></p>
+<p>This is the one rule that must survive your edit. No file in the collection pins a version — not in an install command, not in a <code>package.json</code> snippet, not in prose, not a Docker image tag. Every install takes the current stable release, and the research step is what establishes what that is.</p>
+<pre><code class="language-bash"># Correct
+npm install better-auth
+
+# Wrong — a lie with a timestamp on it
+npm install better-auth@1.2.3
+</code></pre>
+<p><strong>5. Tell the agent which file you changed.</strong></p>
+<p>For a one-off run, you can skip the edit entirely and say it in the prompt:</p>
+<pre><code class="language-text">Use the start-an-app skill, but use Clerk instead of Better Auth — swap it out in references/auth.md.
+</code></pre>
+<h2 id="verify-it-worked">Verify it worked</h2>
+<pre><code class="language-bash">grep -rn &quot;Resend&quot; skills/skills/start-an-app/
+</code></pre>
+<p>No hits for the old provider means the swap is complete. Then check the file still has its three structural parts:</p>
+<pre><code class="language-bash">head -5 skills/skills/start-an-app/references/email.md
+</code></pre>
+<p>Expected: an H1, a <code>Last verified:</code> line, and a <code>**Purpose:**</code> line.</p>
+<p>Run the skill on a throwaway folder before running it on something you care about.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>The agent used the old provider anyway.</strong> It read a different file. Run the <code>grep</code> from step 2 across the whole <code>skills/skills/</code> tree — the provider name almost certainly survives in a second reference file, or in the <code>description</code> front matter of <code>SKILL.md</code>, which is what the agent reads to decide the skill applies.</p>
+<p><strong>Your edits vanished after an update.</strong> <code>npx skills add</code> overwrites. So does <code>git pull</code> in a clone. See the next section.</p>
+<p><strong>The swapped provider has no CLI.</strong> <code>deploy-an-app</code> drives provider CLIs. A host without one cannot be automated, and the skill's <code>--help</code>-outranks-documentation rule has nothing to ask. Pick a host with a CLI, or expect to do that part by hand.</p>
+<h2 id="keeping-your-changes">Keeping your changes</h2>
+<p><code>skills/</code> in this project is a clone of someone else's repository. Local edits conflict on the next pull, and a reinstall overwrites them. Three options, cheapest first:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Survives an update</th>
+<th>Effort</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Say the change in the prompt, per run</td>
+<td>Yes — nothing is edited</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Copy the skill folder to your own skills directory under a new name</td>
+<td>Yes</td>
+<td>One copy</td>
+</tr>
+<tr>
+<td>Fork the repository and install from your fork</td>
+<td>Yes, and you can merge upstream</td>
+<td>A fork</td>
+</tr>
+</tbody>
+</table>
+<p>For a fork, install from it the same way:</p>
+<pre><code class="language-bash">npx skills add &lt;your-user&gt;/skills
+</code></pre>
+<p>Browse before installing, or install one skill at a time:</p>
+<pre><code class="language-bash">npx skills add leonvanzyl/skills --list
+npx skills add leonvanzyl/skills --skill start-an-app
+</code></pre>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="../architecture/shared-design-rules.html">Shared design rules</a> — the invariants your edit must not break</li>
+<li><a href="../overview/key-concepts.html">Key concepts</a> — what a reference file, a brief, and a branch are</li>
+</ul>
+</main></body></html>

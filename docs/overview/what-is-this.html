@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>What this is</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem;background:#0f172a;color:#e2e8f0;
+ font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:52rem;margin:0 auto;background:#1e293b;border:1px solid #334155;
+ border-radius:12px;padding:2rem 2.25rem}
+h1,h2,h3,h4{color:#fb923c;line-height:1.25;margin:2rem 0 .75rem}
+h1{margin-top:0;font-size:1.9rem}h2{font-size:1.4rem;border-bottom:1px solid #334155;padding-bottom:.35rem}
+h3{font-size:1.15rem;color:#2dd4bf}
+a{color:#2dd4bf}a:hover{color:#fb923c}
+p,li{color:#cbd5e1}
+code{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #334155;padding:.5rem .75rem;text-align:left}
+th{background:#0f172a;color:#e2e8f0}
+td{color:#cbd5e1}
+blockquote{margin:1rem 0;padding:.75rem 1rem;border-left:3px solid #fb923c;background:#0f172a;border-radius:0 8px 8px 0}
+blockquote p{margin:.25rem 0}
+hr{border:0;border-top:1px solid #334155;margin:2rem 0}
+</style></head>
+<body><main>
+<h1 id="what-this-is">What this is</h1>
+<p>Four sets of written instructions that tell an AI coding agent how to build, check, ship, and brand a web application.</p>
+<h2 id="the-problem-it-solves">The problem it solves</h2>
+<p>An agent asked to "build me an app" produces a generic scaffold, then claims it works. Nothing checked whether it compiles, whether one user can read another's data, or whether the landing page still describes the product. These skills replace improvisation with a fixed procedure that ends in commands that pass or fail.</p>
+<h2 id="what-a-skill-is">What a skill is</h2>
+<p>A skill is a folder. Inside it:</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SKILL.md</code></td>
+<td>The procedure. Steps, ground rules, and pointers to the reference files. Always read.</td>
+</tr>
+<tr>
+<td><code>references/*.md</code></td>
+<td>One file per component — auth, database, payments, storage. Read only when that component is in play.</td>
+</tr>
+<tr>
+<td><code>scripts/</code></td>
+<td>Executable helpers. Only <code>create-brand-kit</code> has these.</td>
+</tr>
+<tr>
+<td><code>evals/</code></td>
+<td>Test cases for the skill itself. Only <code>create-brand-kit</code> has these.</td>
+</tr>
+</tbody>
+</table>
+<p><code>SKILL.md</code> opens with YAML front matter holding a <code>name</code> and a <code>description</code>. The agent reads the description to decide whether the skill applies to what you just asked for. Everything below the front matter is the procedure.</p>
+<p>Nothing here executes on its own. A skill is text that an agent obeys.</p>
+<h2 id="the-three-step-workflow">The three-step workflow</h2>
+<pre><code>     idea
+      │
+      ▼
+┌──────────────┐   working Next.js app, in your current folder
+│ start-an-app │──────────────────────────────────────────────┐
+└──────────────┘                                              │
+      │ optional, right after                                 │
+      ▼                                                       │
+┌──────────────────┐  logo, wordmark, icons, guidelines       │
+│ create-brand-kit │                                          │
+└──────────────────┘                                          │
+                                                              ▼
+                                                    ┌────────────────┐
+                                                    │ review-an-app  │  read-only report
+                                                    └────────────────┘
+                                                              │
+                                                              ▼
+                                                    ┌────────────────┐
+                                                    │ deploy-an-app  │  live URL
+                                                    └────────────────┘
+</code></pre>
+<p><strong>1. Start.</strong> You describe the app in plain language. The agent interviews you until the nouns (what the app remembers) and the verbs (what people do) are concrete, proposes a written plan, gets your go-ahead, then builds. See <a href="../concepts/start-an-app.html">start-an-app</a>.</p>
+<p><strong>2. Review.</strong> The agent reads the app as it stands today and reports contradictions — security holes, discoverability files that no longer match, claims the app no longer honours. Read-only. See <a href="../concepts/review-an-app.html">review-an-app</a>.</p>
+<p><strong>3. Deploy.</strong> The agent provisions the database and storage, gathers every credential in one sitting, sets every variable, deploys once, then checks the live site with real commands. See <a href="../concepts/deploy-an-app.html">deploy-an-app</a>.</p>
+<p><strong>Bonus: brand.</strong> A full identity process from any starting point, even just a name. See <a href="../concepts/create-brand-kit.html">create-brand-kit</a>.</p>
+<h2 id="the-stack-is-fixed">The stack is fixed</h2>
+<p><code>start-an-app</code> does not choose a framework. It builds Next.js, TypeScript, Tailwind, shadcn/ui, Drizzle, and Better Auth, every time. The interview chooses <em>within</em> that stack: which database, what kind of sign-in, whether there is email, uploads, payments, AI, background jobs, agent access, documentation, and how it looks.</p>
+<p>Everything optional is a <a href="key-concepts.html">branch</a>. A branch that was not chosen produces no code, no dependency, and no settings tab.</p>
+<h2 id="how-the-pieces-fit-together">How the pieces fit together</h2>
+<p>A run of <code>start-an-app</code> goes like this. You say you want a hiking journal. The agent asks what someone does on the first visit and what brings them back, then says the data model back to you in words: <em>hikes — date, trail, distance, how it felt, photos; all yours, nobody else sees them.</em> You correct it. It asks eleven technical questions with a recommendation on each, ending with how the app should look.</p>
+<p>It then installs the agent skills that shadcn, Vercel, Better Auth, the AI SDK, and Anthropic publish for their own libraries, and dispatches one research agent per chosen branch to find what those libraries look like <em>today</em> — because no file in this collection contains a version number.</p>
+<p>It writes a <a href="key-concepts.html">build sheet</a>: the plan in plain words, including the data model, the legal call, the discoverability call, and an explicit <em>not in version one</em> list. You approve it. Only then does anything get built.</p>
+<p>The scaffold runs in a fixed order of sixteen steps, <code>DESIGN.md</code> written second so every later screen is held to it. Then the app is made recognisably yours — real table names, real page copy, no lorem ipsum. Then the <a href="key-concepts.html">gate</a>: types, schema drift, build, lint, the app served in production mode, every route answering, two accounts tested against each other. Then critic agents that never saw the code read the evidence and check it against the build sheet. Then a hand-off naming every check that could not be run.</p>
+<p><code>deploy-an-app</code> repeats that shape on the infrastructure side. <code>review-an-app</code> repeats it on an app that already exists.</p>
+<h2 id="what-this-is-not">What this is not</h2>
+<ul>
+<li><strong>Not a code generator you can script.</strong> Every skill has approval gates and an interview. They are written for a conversation.</li>
+<li><strong>Not framework-agnostic.</strong> <code>start-an-app</code> builds one stack. <code>review-an-app</code> and <code>deploy-an-app</code> work best on that stack and say plainly where they meet something else.</li>
+<li><strong>Not a code review.</strong> <code>review-an-app</code> reads the whole app as it stands, not a pending diff.</li>
+<li><strong>Not a hosting product.</strong> <code>deploy-an-app</code> drives provider CLIs you own, under your accounts.</li>
+<li><strong>Not a test suite.</strong> The gates run type checks, builds, and probes. They do not write unit tests.</li>
+</ul>
+</main></body></html>

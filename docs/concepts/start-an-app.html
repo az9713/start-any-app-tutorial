@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>start-an-app</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem;background:#0f172a;color:#e2e8f0;
+ font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:52rem;margin:0 auto;background:#1e293b;border:1px solid #334155;
+ border-radius:12px;padding:2rem 2.25rem}
+h1,h2,h3,h4{color:#fb923c;line-height:1.25;margin:2rem 0 .75rem}
+h1{margin-top:0;font-size:1.9rem}h2{font-size:1.4rem;border-bottom:1px solid #334155;padding-bottom:.35rem}
+h3{font-size:1.15rem;color:#2dd4bf}
+a{color:#2dd4bf}a:hover{color:#fb923c}
+p,li{color:#cbd5e1}
+code{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #334155;padding:.5rem .75rem;text-align:left}
+th{background:#0f172a;color:#e2e8f0}
+td{color:#cbd5e1}
+blockquote{margin:1rem 0;padding:.75rem 1rem;border-left:3px solid #fb923c;background:#0f172a;border-radius:0 8px 8px 0}
+blockquote p{margin:.25rem 0}
+hr{border:0;border-top:1px solid #334155;margin:2rem 0}
+</style></head>
+<body><main>
+<h1 id="start-an-app">start-an-app</h1>
+<p>Turns an idea into a running full-stack web app in the folder you are standing in. It is the largest skill in the collection — <a href="../../skills/skills/start-an-app/SKILL.md"><code>SKILL.md</code></a> is roughly 47 KB, with seventeen reference files behind it.</p>
+<h2 id="why-it-exists-as-its-own-skill">Why it exists as its own skill</h2>
+<p>An agent handed "build me a hiking journal" will produce a generic CRUD shell and call it done. This skill puts an interview in front of the build and a gate behind it, so the result is an app you recognise and a claim you can check.</p>
+<p>The skill states its own priority plainly: <strong>understanding comes before scaffolding.</strong> Ten minutes of good questions produces an app the user recognises; skipping them produces a shell they have to rewrite. Nothing touches the app before the build sheet is agreed, except the six skill installs in Step 2a.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>Eleven steps, in order.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Name</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1a</td>
+<td>Understand the idea</td>
+<td>Open questions until the nouns and verbs are concrete; the data model said back in plain words</td>
+</tr>
+<tr>
+<td>1b</td>
+<td>Find the gaps</td>
+<td>Nine silent checks; two or three raised as suggestions</td>
+</tr>
+<tr>
+<td>1c</td>
+<td>Technical choices</td>
+<td>Twelve branch questions, one at a time, each with a recommendation</td>
+</tr>
+<tr>
+<td>2a</td>
+<td>Install the official skills</td>
+<td>Six <code>npx skills add ... -g</code> commands</td>
+</tr>
+<tr>
+<td>2b</td>
+<td>Check what's left</td>
+<td>One research subagent per chosen branch, dispatched in one message</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Build sheet</td>
+<td>The plan in plain words; you approve it</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Scaffold</td>
+<td>Sixteen reference files, in a fixed order</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Make it theirs</td>
+<td>Real names, real copy, real pages, the verbs wired up</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Prove it</td>
+<td>Commands that pass or fail (<code>references/verify.md</code>)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Fresh eyes</td>
+<td>Critic subagents against the build sheet, two rounds</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Hand off</td>
+<td>Every unrun check named, with what it would need</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-1-the-interview">Step 1 — the interview</h3>
+<p><strong>1a</strong> asks the highest-value question in the skill: the agent says the data model back to you in plain words and lets you correct it. People who cannot design a schema can absolutely tell you what is wrong with one.</p>
+<p><strong>1b</strong> runs nine checks silently and raises only the ones that apply: whose data is it, can things be changed, is anyone special, what does day one look like, anything time-based, does anyone need telling, does anything take a while, phone or desktop, and what is deliberately <em>not</em> in version one. Raising all nine is an interrogation.</p>
+<p><strong>1c</strong> walks the twelve branch questions. Each carries a recommendation so you can answer "whatever you recommend":</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Who will use it?</td>
+<td>SQLite for one person, Postgres-in-Docker for more</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Do people sign in?</td>
+<td>Email + password; Google optional</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Any email?</td>
+<td>Resend if yes; skipped entirely if no</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Any uploads?</td>
+<td>Local folder now, cloud storage on deploy — same code</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Any payments?</td>
+<td>Polar recommended, Stripe if you already use it. Requires sign-in</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Any AI?</td>
+<td>Only if yes; AI SDK over OpenRouter</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Background work?</td>
+<td><strong>No.</strong> Inngest only when work must survive a restart, retry, or run on a schedule</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Agent access over MCP?</td>
+<td>A genuine either/or, asked without leaning. Requires sign-in</td>
+</tr>
+<tr>
+<td>9</td>
+<td>What do signed-out visitors see?</td>
+<td>Decides landing page vs straight into the app</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Help pages?</td>
+<td><strong>No</strong>, and only asked if 9 was a real landing page</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Should it be found?</td>
+<td>Only asked where the app is public. Otherwise, deliberately kept out of search</td>
+</tr>
+<tr>
+<td>12</td>
+<td>How should it look?</td>
+<td>Asked of every app, asked last</td>
+</tr>
+</tbody>
+</table>
+<p>Question 12 accepts three kinds of answer: a description ("calm and minimal"), a pasted design system, or "you pick". A pasted system <strong>wins outright</strong> and is used as given, not as inspiration. A description is played back as decisions — a named neutral base, one accent, a radius, a font — so you correct something concrete instead of agreeing with a mood.</p>
+<h3 id="step-2-current-facts-in-two-halves">Step 2 — current facts, in two halves</h3>
+<p><strong>2a installs six official skills globally</strong>, before any research:</p>
+<pre><code class="language-bash">npx skills add https://github.com/shadcn-ui/ui --skill shadcn -g --agent claude-code -y
+npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices -g --agent claude-code -y
+npx skills add https://github.com/vercel-labs/agent-skills --skill deploy-to-vercel -g --agent claude-code -y
+npx skills add https://github.com/better-auth/skills --skill better-auth-best-practices -g --agent claude-code -y
+npx skills add https://github.com/vercel/ai --skill ai-sdk -g --agent claude-code -y
+npx skills add https://github.com/anthropics/skills --skill mcp-builder -g --agent claude-code -y
+</code></pre>
+<p><code>-g</code> matters twice. The folder you are standing in is about to become the app, and <code>create-next-app .</code> refuses to run in a non-empty directory — a project-level install would put <code>.claude/</code> there and break every build. And these are documentation for a fixed stack, so installing once serves every future app. <code>--agent claude-code -y</code> is what makes each command non-interactive; without both flags it stops on a prompt with nobody to answer it.</p>
+<p>All six install even where a branch was not chosen. They are inert until read.</p>
+<p><strong>2b dispatches one research subagent per chosen branch, all in a single message.</strong> No file in this skill names a version, deliberately — this half is where versions come from. Two branches get extra instructions: the agent-access branch must establish the current Model Context Protocol revision, because a protocol can deprecate something without any package changing its name; the discoverability branch researches conventions rather than packages, including the current AI-crawler user-agent tokens, because a wrong crawler name in <code>robots.ts</code> is not an error, it is a rule that silently matches nothing.</p>
+<p><strong>Precedence when sources disagree:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Disagreement</th>
+<th>Winner</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Official skill vs reference file, on API detail</td>
+<td>Official skill</td>
+<td>It is the maintainer speaking about their own library</td>
+</tr>
+<tr>
+<td>Official skill vs reference file, on wiring into this app</td>
+<td>Reference file</td>
+<td>It knows which file owns what, and how it meets the schema, session, and log</td>
+</tr>
+<tr>
+<td>Research vs official skill, on what is published now</td>
+<td>Research</td>
+<td>The registry is the fact; a skill is a file, and files go stale</td>
+</tr>
+<tr>
+<td>Research vs official skill, on which pattern to use</td>
+<td>Official skill</td>
+<td>Several patterns work; the author knows which one they mean</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-4-the-scaffold-order">Step 4 — the scaffold order</h3>
+<p>Sixteen steps, and the order carries most of the reasoning:</p>
+<ol>
+<li>Base project — <code>references/stack.md</code></li>
+<li><strong>Design system — <code>references/design.md</code></strong> (always)</li>
+<li>Database — <code>references/database.md</code></li>
+<li>Sign-in, if chosen — <code>references/auth.md</code></li>
+<li>Email, if chosen — <code>references/email.md</code></li>
+<li>File uploads, if chosen — <code>references/storage.md</code></li>
+<li>Payments, if chosen — <code>references/payments.md</code></li>
+<li>AI features, if chosen — <code>references/ai.md</code></li>
+<li>Background jobs, if chosen — <code>references/jobs.md</code></li>
+<li>Landing page and dashboard — <code>references/pages.md</code></li>
+<li>Agent access, if chosen — <code>references/mcp.md</code></li>
+<li>Public documentation, if chosen — <code>references/docs.md</code></li>
+<li>Legal pages and consent — <code>references/legal.md</code></li>
+<li>Account settings — <code>references/settings.md</code></li>
+<li>System visibility — <code>references/ops.md</code> (always)</li>
+<li>Discoverability — <code>references/seo.md</code> (always)</li>
+</ol>
+<p>The design system is <strong>second</strong> because it is the only step every later one reads from, and retrofitting a theme onto pages already written means editing all of them. It is also where <code>AGENTS.md</code> and <code>CLAUDE.md</code> are written, so every later step and every future agent is held to the same document.</p>
+<p>Payments, uploads, and agent access all extend what sign-in built. Documentation can only describe branches that exist, and runs before legal so that legal's pass over the footer sees the docs link. Legal runs after every feature branch, because the privacy page has to describe all of them, and before settings, which grows a cookie-preferences section only if a banner was built. <strong>Discoverability is last</strong> because it writes the sitemap from a list of every public page, and legal and documentation both add pages to it.</p>
+<p>The last three are not a polish pass. Two turn a scaffold into something you can operate, and the third decides whether anyone finds it.</p>
+<h3 id="steps-6-and-7-the-two-checks">Steps 6 and 7 — the two checks</h3>
+<p>Step 6 runs commands and reads their output: types, schema drift, the build, lint, the app served in production mode, every route answering, two accounts tested against each other, and the app with its keys taken away. Two orderings matter:</p>
+<blockquote>
+<p><strong>Warning:</strong> Generate the schema before the build. <code>build</code> runs <code>db:migrate</code> first, so reaching it with an ungenerated schema edit outstanding applies SQL nobody read.</p>
+<p><strong>Warning:</strong> The user signs up before any probe account exists. The first account created becomes the admin — a fixture that takes that place, then gets deleted, locks the user out of their own system page.</p>
+</blockquote>
+<p>Step 7 dispatches critics because the gate cannot tell whether the app <em>does</em> anything. An empty project passes every command, because nothing leaks when there is nothing to leak. The critics are promise-keeping and looks-like-theirs always, ownership wherever there is sign-in, and operability scaled to the branches that ran. They measure against the build sheet and nothing else.</p>
+<h2 id="interaction-with-other-skills">Interaction with other skills</h2>
+<ul>
+<li><code>create-brand-kit</code> is best run right after this, before you show the app to anyone.</li>
+<li><code>review-an-app</code> covers what this skill's critics cannot: the app six months later, drifted past the sheet it was built to.</li>
+<li><code>deploy-an-app</code> takes the result live. <code>deploy-to-vercel</code>, installed in Step 2a, is unused during the build and waits for that moment.</li>
+</ul>
+<h2 id="gotchas">Gotchas</h2>
+<p><strong>Never <code>drizzle-kit push</code>.</strong> Schema changes go through <code>db:generate</code> then <code>db:migrate</code>, every time, from the first table.</p>
+<p><strong>Ids are UUIDs — except in Better Auth's tables.</strong> Those stay exactly as its CLI generates them, which means any column pointing at a user stays <code>text</code>, not <code>uuid</code>.</p>
+<p><strong>No subfolder.</strong> The app is scaffolded in the current working directory. You already chose where it goes by being there.</p>
+<p><strong>No version numbers, anywhere.</strong> Not in an install command, not in a <code>package.json</code> snippet, not a Docker image tag. A version written into a skill file is a lie with a timestamp on it.</p>
+<p><strong>Nothing deprecated.</strong> Still working is what deprecated means — it is a removal notice with a delay on it.</p>
+<h2 id="reference-files">Reference files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stack.md</code></td>
+<td>The Next.js project everything else builds on</td>
+</tr>
+<tr>
+<td><code>design.md</code></td>
+<td><code>DESIGN.md</code>, theme tokens, <code>AGENTS.md</code>, <code>CLAUDE.md</code></td>
+</tr>
+<tr>
+<td><code>database.md</code></td>
+<td>Drizzle, with a SQLite branch and a Postgres-in-Docker branch</td>
+</tr>
+<tr>
+<td><code>auth.md</code></td>
+<td>Better Auth, email + password, optional Google</td>
+</tr>
+<tr>
+<td><code>email.md</code></td>
+<td>Resend. Nothing sends until it is logged</td>
+</tr>
+<tr>
+<td><code>storage.md</code></td>
+<td>One storage module, two backends chosen at runtime</td>
+</tr>
+<tr>
+<td><code>payments.md</code></td>
+<td>Polar or Stripe, always through the Better Auth plugin</td>
+</tr>
+<tr>
+<td><code>ai.md</code></td>
+<td>AI SDK with OpenRouter</td>
+</tr>
+<tr>
+<td><code>jobs.md</code></td>
+<td>Inngest, with the app keeping its own record of every job</td>
+</tr>
+<tr>
+<td><code>pages.md</code></td>
+<td>Landing page and dashboard — the step that decides if it looks like your app</td>
+</tr>
+<tr>
+<td><code>mcp.md</code></td>
+<td>Agent access. The largest reference file at ~38 KB</td>
+</tr>
+<tr>
+<td><code>docs.md</code></td>
+<td>Public help pages, only where somebody would read them</td>
+</tr>
+<tr>
+<td><code>legal.md</code></td>
+<td>Privacy, terms, cookie consent — decided, never asked</td>
+</tr>
+<tr>
+<td><code>settings.md</code></td>
+<td>Profile, verification, password, devices, leaving</td>
+</tr>
+<tr>
+<td><code>ops.md</code></td>
+<td>The system page. Always runs</td>
+</tr>
+<tr>
+<td><code>seo.md</code></td>
+<td>Sitemap, <code>robots.txt</code>, <code>llms.txt</code>, or a deliberate keep-me-out</td>
+</tr>
+<tr>
+<td><code>verify.md</code></td>
+<td>The gate commands and the critic briefs. ~32 KB</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../guides/customizing-references.html">customizing a skill</a> to change any of them, and <a href="../architecture/shared-design-rules.html">shared design rules</a> for the invariants this skill shares with the other three.</p>
+</main></body></html>

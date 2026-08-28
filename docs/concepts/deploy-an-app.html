@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>deploy-an-app</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem;background:#0f172a;color:#e2e8f0;
+ font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:52rem;margin:0 auto;background:#1e293b;border:1px solid #334155;
+ border-radius:12px;padding:2rem 2.25rem}
+h1,h2,h3,h4{color:#fb923c;line-height:1.25;margin:2rem 0 .75rem}
+h1{margin-top:0;font-size:1.9rem}h2{font-size:1.4rem;border-bottom:1px solid #334155;padding-bottom:.35rem}
+h3{font-size:1.15rem;color:#2dd4bf}
+a{color:#2dd4bf}a:hover{color:#fb923c}
+p,li{color:#cbd5e1}
+code{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #334155;padding:.5rem .75rem;text-align:left}
+th{background:#0f172a;color:#e2e8f0}
+td{color:#cbd5e1}
+blockquote{margin:1rem 0;padding:.75rem 1rem;border-left:3px solid #fb923c;background:#0f172a;border-radius:0 8px 8px 0}
+blockquote p{margin:.25rem 0}
+hr{border:0;border-top:1px solid #334155;margin:2rem 0}
+</style></head>
+<body><main>
+<h1 id="deploy-an-app">deploy-an-app</h1>
+<p>Takes a Next.js app that runs on your machine and puts it into production on Vercel, then proves the live site works. <a href="../../skills/skills/deploy-an-app/SKILL.md"><code>SKILL.md</code></a>, thirteen reference files.</p>
+<h2 id="why-it-exists-as-its-own-skill">Why it exists as its own skill</h2>
+<p>The value is not that it types <code>vercel deploy</code>. It is that it asks for every human-only credential <strong>once, in one place, before anything starts</strong> — rather than discovering them one failed build at a time.</p>
+<p>The skill draws a hard line around itself: <strong>deploying is not building.</strong> It provisions infrastructure, sets configuration, and runs deploys. It does not add features, redesign pages, or improve code it happens to dislike. There is exactly one common case where production requires a code change — a SQLite app moving to Postgres — and that goes on the sheet in Step 3 and is approved before it happens.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>Twelve steps. The ordering is the design.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Name</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Preflight</td>
+<td>Read the machine, the account, the code. Change nothing</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Check what's current</td>
+<td>One research subagent per detected branch</td>
+</tr>
+<tr>
+<td>2</td>
+<td>What only the user knows</td>
+<td>The address, the credentials, test mode or real money</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Deploy sheet</td>
+<td>The plan in plain words. The only decision point</td>
+</tr>
+<tr>
+<td>4</td>
+<td>The address</td>
+<td>Create the project, read back the real URL, start DNS</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Provision and prepare</td>
+<td>Database, storage, the SQLite conversion, a local build against production</td>
+</tr>
+<tr>
+<td>6</td>
+<td>The rendezvous</td>
+<td>One announced pause for browser work</td>
+</tr>
+<tr>
+<td>7</td>
+<td>The environment</td>
+<td>Every variable written, then webhooks and job keys wired</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Deploy</td>
+<td>Once</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Prove it</td>
+<td>Commands against the live URL, whose output is read</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Fresh eyes</td>
+<td>Critic subagents, read-only, two rounds</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Hand off</td>
+<td>What exists, what it costs, what a <code>git push</code> now does</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-0-preflight">Step 0 — Preflight</h3>
+<p>Nothing here mutates anything. It establishes: whether the hosting CLI is available and what it can do, whether you are logged in and under which account, what this app is and what its build command really runs, which features it has, every environment variable the code reads, and whether the git tree is clean.</p>
+<p><strong>The branch list comes from the code.</strong> An app has payments because there is a payments client in it, not because you remembered to mention it. This is also what lets the skill work on an app it did not build.</p>
+<blockquote>
+<p><strong>Warning:</strong> A dirty tree stops here. A deploy cut from uncommitted work is a build nobody can reproduce, and the two deploy mechanisms — a push and a direct upload — disagree about what it even contains.</p>
+</blockquote>
+<p>Preflight also asks whether there is already a production deployment with users on it. If so the posture changes for the whole run: nothing is created from scratch, and Step 8 stops deploying straight to production. That is established here, not at the moment it matters.</p>
+<h3 id="step-1-check-whats-current">Step 1 — Check what's current</h3>
+<p>One research subagent per detected branch, all in a single message. Hosting CLIs, dashboards, and provider APIs move faster than application libraries, and they move in a way that breaks scripts rather than types. A renamed flag is a pipeline that stops halfway through, having already created things.</p>
+<blockquote>
+<p><strong>Note:</strong> On what the hosting CLI can do, <code>--help</code> outranks everything — this skill, its reference files, the research, and the provider's own documentation. Documentation describes the release the writer had. Ask the binary that is about to run.</p>
+</blockquote>
+<h3 id="steps-2-and-3-one-decision-point">Steps 2 and 3 — one decision point</h3>
+<p>Step 2 asks three things, one at a time. The address comes first because every callback URL, every webhook target, and the sign-in origin derive from it, and each one that changes later is manual work done twice. Then every provider credential the detected branches need, gathered in <strong>one block</strong> — not one question per failure. Then, if payments exist, test mode or real money.</p>
+<p>Step 3 restates it as a deploy sheet: what will be created, what it costs, what is irreversible, and where the pause lands. <strong>One approval, and one announced pause</strong> — Step 3 is the only place you decide anything, and Step 6 is a scheduled hand-off promised in advance.</p>
+<p>Real money is the one carve-out. It is the only action that can charge a real card, and live prices cannot be deleted afterwards, so it takes a separate explicit confirmation.</p>
+<h3 id="step-4-the-address-before-anything-exists">Step 4 — the address, before anything exists</h3>
+<p>Create the project, <strong>read back the production URL the platform actually assigned</strong>, attach the custom domain, and produce the DNS records. A name collision makes the host assign something else, and every value derived from a guessed URL — the sign-in origin, the OAuth callbacks, the token audience — is then quietly wrong.</p>
+<p>DNS starts early because it is the slowest thing in the pipeline and depends on nothing.</p>
+<p>Where a domain is involved, decide the canonical host — bare or <code>www</code> — and redirect the other to it. A session cookie set on the wrong one is a sign-in that appears to work and then does not.</p>
+<h3 id="step-5-provision-and-the-best-value-check-in-the-skill">Step 5 — provision, and the best-value check in the skill</h3>
+<p>Create the database and the file store and connect them. Two details decide whether it works: the name the provider injects may not be the name the code reads, and migrations want the direct connection string while the app wants the pooled one.</p>
+<p>Any code change happens here — the SQLite conversion, and reconciling a variable name — and gets committed.</p>
+<p><strong>Then build locally against the production database, before deploying anything.</strong> It runs the same migrate-then-build the platform will run, catches the conversion and every module-scope key, and costs no deployments.</p>
+<h3 id="step-7-the-environment-before-the-build">Step 7 — the environment, before the build</h3>
+<p>Every variable the code reads is written to production before any build runs. Provider clients get constructed when a module is first imported, so a missing key is a failed build, not a runtime warning.</p>
+<blockquote>
+<p><strong>Warning:</strong> <code>.env</code> is not a deployment artefact. Some values in it are actively dangerous in production — a local database address, a sandbox payments flag, a switch that turns off signature checking. Each is copied, transformed, regenerated, or refused deliberately. <code>references/env.md</code> has the table; there is no copy loop.</p>
+</blockquote>
+<p>Three things make this more than a copy: values that must be transformed or refused; secrets corrupted by an invisible trailing newline that cannot be read back to diagnose; and the fact that a written secret can be confirmed to <em>exist</em> but never to be <em>correct</em>.</p>
+<h3 id="steps-8-and-9-one-deploy-then-proof">Steps 8 and 9 — one deploy, then proof</h3>
+<p>Everything the build needs is already in place, so the first deploy is the first one that can succeed. Where you have a repository, connect it and let a push produce the deploy — the mechanism you will use forever is the one that just got proven.</p>
+<p>Then confirm the deployment that went live is the commit you think it is. One command, and it catches the two most common false victories: reading the previous build's result while the new one is still running, and deploying something that was never committed.</p>
+<p>Step 9 runs commands against the live URL. More is provable from outside without a browser than it looks: the deployed commit, that migrations ran, that the database answers, every route, the certificate and canonical host, cookie flags, that a webhook endpoint verifies signatures rather than accepting anything, and that discovery documents name the real domain.</p>
+<blockquote>
+<p><strong>Note:</strong> Distinguish failed from blocked from not attempted. If DNS has not landed, every check behind the domain is red for one reason. Reporting fifteen failures for one cause teaches the user to ignore the gate.</p>
+</blockquote>
+<h2 id="interaction-with-other-skills">Interaction with other skills</h2>
+<ul>
+<li>Expects what <code>start-an-app</code> builds, but detects branches from code, so it works on other apps.</li>
+<li>Run <code>review-an-app</code> first if the app has been alive a while.</li>
+<li><code>deploy-to-vercel</code>, one of the six official skills <code>start-an-app</code> Step 2a installs, is the one that was never used during the build — this is its moment.</li>
+</ul>
+<h2 id="gotchas">Gotchas</h2>
+<p><strong>Check before creating, and write down what was created.</strong> Every provider will happily create a second one of anything. Two webhooks on one URL means every event processed twice, with half the signature checks failing. The <a href="../overview/key-concepts.html">ledger</a> is written as each resource is created, never reconstructed afterwards.</p>
+<p><strong>When something fails, stop and report — never tear down.</strong> A database a later step could not reach still holds the schema that worked. <code>references/recovery.md</code> says what can be undone and what cannot.</p>
+<p><strong>Never delete or overwrite something this run did not create.</strong> A name collision stops and asks. The exception is a value this run wrote itself and is correcting.</p>
+<p><strong>The gate is passed by fixing the deploy, never by widening the gate.</strong> No build-error suppression, no skipping validation, and above all never removing the migration step from the build script to make a red build go green.</p>
+<p><strong>Never <code>drizzle-kit push</code>.</strong> <code>start-an-app</code> bans it while building. Here the database has real data in it.</p>
+<p><strong>No subfolder.</strong> Deploys from the current working directory.</p>
+<h2 id="reference-files">Reference files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>preflight.md</code></td>
+<td>The three inventories: CLI, app, environment variables</td>
+</tr>
+<tr>
+<td><code>project-and-url.md</code></td>
+<td>Creating the project, reading back the real URL, DNS records</td>
+</tr>
+<tr>
+<td><code>provision-database.md</code></td>
+<td>Hosted Postgres, and the SQLite conversion</td>
+</tr>
+<tr>
+<td><code>provision-storage.md</code></td>
+<td>Uploads in production — a setting, not a code change</td>
+</tr>
+<tr>
+<td><code>env.md</code></td>
+<td>The variable table: copy, transform, regenerate, or refuse</td>
+</tr>
+<tr>
+<td><code>wire-auth.md</code></td>
+<td>Sign-in on the real domain. Never weaken auth to make something work</td>
+</tr>
+<tr>
+<td><code>wire-email.md</code></td>
+<td>Domain verification. Start first, check last — it is the only step measured in hours</td>
+</tr>
+<tr>
+<td><code>wire-payments.md</code></td>
+<td>Webhooks, test mode by default</td>
+</tr>
+<tr>
+<td><code>wire-jobs.md</code></td>
+<td>Background jobs, and keeping the development flag out of production</td>
+</tr>
+<tr>
+<td><code>wire-mcp.md</code></td>
+<td>Agent access, where one wrong character fails with no useful error</td>
+</tr>
+<tr>
+<td><code>deploy.md</code></td>
+<td>The deploy itself, and the already-live-with-users posture</td>
+</tr>
+<tr>
+<td><code>gate.md</code></td>
+<td>The live checks, and the critic briefs</td>
+</tr>
+<tr>
+<td><code>recovery.md</code></td>
+<td>The ledger format, and what happens when a step fails halfway</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../architecture/shared-design-rules.html">shared design rules</a> for the invariants this skill shares with the other three.</p>
+</main></body></html>
