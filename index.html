@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Deep-dive documentation for Leon van Zyl's agent skills</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem;background:#0f172a;color:#e2e8f0;
+ font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:52rem;margin:0 auto;background:#1e293b;border:1px solid #334155;
+ border-radius:12px;padding:2rem 2.25rem}
+h1,h2,h3,h4{color:#fb923c;line-height:1.25;margin:2rem 0 .75rem}
+h1{margin-top:0;font-size:1.9rem}h2{font-size:1.4rem;border-bottom:1px solid #334155;padding-bottom:.35rem}
+h3{font-size:1.15rem;color:#2dd4bf}
+a{color:#2dd4bf}a:hover{color:#fb923c}
+p,li{color:#cbd5e1}
+code{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #334155;padding:.5rem .75rem;text-align:left}
+th{background:#0f172a;color:#e2e8f0}
+td{color:#cbd5e1}
+blockquote{margin:1rem 0;padding:.75rem 1rem;border-left:3px solid #fb923c;background:#0f172a;border-radius:0 8px 8px 0}
+blockquote p{margin:.25rem 0}
+hr{border:0;border-top:1px solid #334155;margin:2rem 0}
+</style></head>
+<body><main>
+<h1 id="deep-dive-documentation-for-leon-van-zyls-agent-skills">Deep-dive documentation for Leon van Zyl's agent skills</h1>
+<blockquote>
+<p><strong>This repository is documentation, not code.</strong>
+It is a <strong>deep dive into a clone of another repository</strong> — <a href="https://github.com/leonvanzyl/skills"><strong>leonvanzyl/skills</strong></a>, by Leon van Zyl.
+Every skill described here is his work. Nothing in this repository replaces it, forks it, or ships it.
+To get the skills themselves, go to the original: <strong>https://github.com/leonvanzyl/skills</strong></p>
+<p><strong>The video that started this:</strong> <a href="https://www.youtube.com/watch?v=tqi4cTZZWzQ&amp;t=5s"><strong>The 3 Skills I Use to Build Any Web App</strong></a></p>
+</blockquote>
+<hr />
+<h2 id="what-this-is">What this is</h2>
+<p>Leon van Zyl publishes four agent skills that take a web app from an idea to a live URL: <strong>start it, review it, deploy it</strong>, plus a <strong>brand kit</strong> for the logo. They are Markdown instruction files that an AI coding agent reads. They contain no application code.</p>
+<p>The skills are large. <code>start-an-app/SKILL.md</code> alone is about 47 KB, with 17 reference files behind it. Reading all of that to decide whether a skill fits your project is a lot of work.</p>
+<p>This repository is that reading, done once. It explains what each skill does, in what order, and why each rule exists.</p>
+<h2 id="start-here">Start here</h2>
+<p><strong><a href="docs/index.html"><code>docs/index.md</code></a></strong> — the navigation hub.</p>
+<table>
+<thead>
+<tr>
+<th>Read this</th>
+<th>If you want</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="docs/overview/what-is-this.html">What this is</a></td>
+<td>The mental model, and what a skill actually is</td>
+</tr>
+<tr>
+<td><a href="docs/overview/key-concepts.html">Key concepts</a></td>
+<td>The vocabulary — build sheet, lens, gate, ledger, branch, drift</td>
+</tr>
+<tr>
+<td><a href="docs/concepts/start-an-app.html">start-an-app</a></td>
+<td>The 11 steps, the 12 interview questions, the 16-step scaffold order</td>
+</tr>
+<tr>
+<td><a href="docs/concepts/review-an-app.html">review-an-app</a></td>
+<td>The evidence pack, the three parallel lenses, the report</td>
+</tr>
+<tr>
+<td><a href="docs/concepts/deploy-an-app.html">deploy-an-app</a></td>
+<td>The 12 steps, from preflight to hand-off</td>
+</tr>
+<tr>
+<td><a href="docs/concepts/create-brand-kit.html">create-brand-kit</a></td>
+<td>The 7 phases, the depth levels, what ships in the kit</td>
+</tr>
+<tr>
+<td><a href="docs/guides/customizing-references.html">Customize a skill</a></td>
+<td>To swap the auth provider, the host, or any component</td>
+</tr>
+<tr>
+<td><a href="docs/architecture/shared-design-rules.html">Shared design rules</a></td>
+<td>The 8 invariants all four skills repeat, and why</td>
+</tr>
+</tbody>
+</table>
+<h2 id="get-the-actual-skills">Get the actual skills</h2>
+<p>From the original repository, not from this one:</p>
+<pre><code class="language-bash">npx skills add leonvanzyl/skills
+</code></pre>
+<p>Browse first, or install one at a time:</p>
+<pre><code class="language-bash">npx skills add leonvanzyl/skills --list
+npx skills add leonvanzyl/skills --skill start-an-app
+</code></pre>
+<p>They work with Claude Code, Cursor, Codex, OpenCode, and any other agent the <a href="https://github.com/vercel-labs/skills"><code>skills</code> CLI</a> supports.</p>
+<h2 id="the-four-skills-in-one-line-each">The four skills, in one line each</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>start-an-app</code></td>
+<td>Interviews you until the idea is concrete, then builds a Next.js app in your current folder and proves it works</td>
+</tr>
+<tr>
+<td><code>review-an-app</code></td>
+<td>Reads an app that already exists and reports contradictions between what it claims and what it does. Read-only</td>
+</tr>
+<tr>
+<td><code>deploy-an-app</code></td>
+<td>Provisions the infrastructure, gathers every credential once, deploys once, then checks the live site</td>
+</tr>
+<tr>
+<td><code>create-brand-kit</code></td>
+<td>Runs a critique-driven identity process from any starting point and packages the full kit</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-is-not-in-this-repository">What is not in this repository</h2>
+<p>The skills. The <code>skills/</code> folder on the machine these docs were written from is a git clone of the original, and it is deliberately <strong>not tracked here</strong> — cloning someone else's repository into your own is how you end up shipping a stale copy of their work.</p>
+<h2 id="accuracy">Accuracy</h2>
+<p>These docs describe <code>leonvanzyl/skills</code> at commit <strong><code>b82bf0c</code></strong>.</p>
+<p>The skills carry their own staleness convention: every reference file starts with a <code>Last verified:</code> date. Trust a recent date. Treat an old one as an assumption that something has moved. After you pull the original repository, re-check the pages against the files they track — <a href="docs/index.html"><code>docs/index.md</code></a> has that mapping in a table.</p>
+<h2 id="credit">Credit</h2>
+<ul>
+<li><strong>The skills:</strong> <a href="https://github.com/leonvanzyl">Leon van Zyl</a> — <a href="https://github.com/leonvanzyl/skills">leonvanzyl/skills</a></li>
+<li><strong>The video:</strong> <a href="https://www.youtube.com/watch?v=tqi4cTZZWzQ&amp;t=5s">The 3 Skills I Use to Build Any Web App</a></li>
+<li><strong>This documentation:</strong> written from the source files, in this repository only.</li>
+</ul>
+</main></body></html>
