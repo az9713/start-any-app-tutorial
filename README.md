@@ -19,18 +19,20 @@ This repository is that reading, done once. It explains what each skill does, in
 
 ## Start here
 
+**Read it as a website: <https://az9713.github.io/start-any-app-tutorial/>** — every page below, rendered.
+
 **[`docs/index.md`](docs/index.md)** — the navigation hub.
 
-| Read this | If you want |
-| --- | --- |
-| [What this is](docs/overview/what-is-this.md) | The mental model, and what a skill actually is |
-| [Key concepts](docs/overview/key-concepts.md) | The vocabulary — build sheet, lens, gate, ledger, branch, drift |
-| [start-an-app](docs/concepts/start-an-app.md) | The 11 steps, the 12 interview questions, the 16-step scaffold order |
-| [review-an-app](docs/concepts/review-an-app.md) | The evidence pack, the three parallel lenses, the report |
-| [deploy-an-app](docs/concepts/deploy-an-app.md) | The 12 steps, from preflight to hand-off |
-| [create-brand-kit](docs/concepts/create-brand-kit.md) | The 7 phases, the depth levels, what ships in the kit |
-| [Customize a skill](docs/guides/customizing-references.md) | To swap the auth provider, the host, or any component |
-| [Shared design rules](docs/architecture/shared-design-rules.md) | The 8 invariants all four skills repeat, and why |
+| Read this | Web | If you want |
+| --- | --- | --- |
+| [What this is](docs/overview/what-is-this.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/overview/what-is-this.html) | The mental model, and what a skill actually is |
+| [Key concepts](docs/overview/key-concepts.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/overview/key-concepts.html) | The vocabulary — build sheet, lens, gate, ledger, branch, drift |
+| [start-an-app](docs/concepts/start-an-app.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/concepts/start-an-app.html) | The 11 steps, the 12 interview questions, the 16-step scaffold order |
+| [review-an-app](docs/concepts/review-an-app.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/concepts/review-an-app.html) | The evidence pack, the three parallel lenses, the report |
+| [deploy-an-app](docs/concepts/deploy-an-app.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/concepts/deploy-an-app.html) | The 12 steps, from preflight to hand-off |
+| [create-brand-kit](docs/concepts/create-brand-kit.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/concepts/create-brand-kit.html) | The 7 phases, the depth levels, what ships in the kit |
+| [Customize a skill](docs/guides/customizing-references.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/guides/customizing-references.html) | To swap the auth provider, the host, or any component |
+| [Shared design rules](docs/architecture/shared-design-rules.md) | [html](https://az9713.github.io/start-any-app-tutorial/docs/architecture/shared-design-rules.html) | The 8 invariants all four skills repeat, and why |
 
 ## Get the actual skills
 
